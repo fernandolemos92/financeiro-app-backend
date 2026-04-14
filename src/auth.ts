@@ -18,17 +18,19 @@ export const auth = betterAuth({
       enabled: true,
       maxAge: 5 * 60,
     },
-    cookieOptions: {
-      sameSite: "none",
-      secure: true,
-      httpOnly: true,
-    },
   },
   trustedOrigins: [
     process.env.BETTER_AUTH_URL || "http://localhost:3001",
     process.env.APP_URL || "http://localhost:3000",
   ],
   secret: process.env.BETTER_AUTH_SECRET,
+  advanced: {
+    defaultCookieAttributes: {
+      sameSite: "none",
+      secure: true,
+      httpOnly: true,
+    },
+  },
 })
 
 export type Auth = typeof auth
