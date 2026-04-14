@@ -6,6 +6,7 @@ import type {
 import {
   dbCreate,
   dbDelete,
+  dbDeleteSeries,
   dbFindAll,
   dbFindById,
   dbUpdate,
@@ -72,4 +73,14 @@ export async function deleteTransaction(id: string, userId: string): Promise<voi
   if (!deleted) {
     throw new ForbiddenError(`Transaction not found or access denied: ${id}`)
   }
+}
+
+export async function deleteTransactionSeries(groupId: string, userId: string): Promise<number> {
+  const deletedCount = await dbDeleteSeries(groupId, userId)
+
+  if (deletedCount === 0) {
+    throw new ForbiddenError(`Transaction series not found or access denied: ${groupId}`)
+  }
+
+  return deletedCount
 }

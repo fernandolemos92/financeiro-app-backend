@@ -4,6 +4,7 @@ import { CreateTransactionSchema, UpdateTransactionSchema } from "@/schemas/tran
 import {
   createTransaction,
   deleteTransaction,
+  deleteTransactionSeries,
   getTransaction,
   listTransactions,
   NotFoundError,
@@ -163,6 +164,27 @@ router.delete("/:id", async (c) => {
       return c.json({ error: "Unauthorized" }, { status: 401 })
     }
     console.error("Error deleting transaction:", error)
+    return c.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    )
+  }
+})
+
+router.delete("/series/:groupId", async (c) => {
+  try {
+    const userId = requireAuthenticatedUserId(c)
+    const groupId = c.req.param("groupId")
+    const deletedCount = await deleteTransactionSeries(groupId, userId)
+    return c.json({ data: { deletedCount, groupId } })
+  } catch (error) {
+    if (error instanceof NotFoundError) {
+      return c.json({ error: error.message }, { status: 404 })
+    }
+    if (error instanceof Error && error.message === "Unauthorized") {
+      return c.json({ error: "Unauthorized" }, { status: 401 })
+    }
+    console.error("Error deleting transaction series:", error)
     return c.json(
       { error: "Internal server error" },
       { status: 500 }

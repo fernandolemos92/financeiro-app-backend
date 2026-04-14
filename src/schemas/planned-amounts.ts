@@ -2,10 +2,10 @@ import { z } from "zod"
 
 export const UpsertPlannedAmountsSchema = z
   .object({
-    debt: z.number().nonnegative().optional(),
-    cost_of_living: z.number().nonnegative().optional(),
-    pleasure: z.number().nonnegative().optional(),
-    application: z.number().nonnegative().optional(),
+    debt: z.number().nonnegative().max(999999999.99, "Value too large").optional(),
+    cost_of_living: z.number().nonnegative().max(999999999.99, "Value too large").optional(),
+    pleasure: z.number().nonnegative().max(999999999.99, "Value too large").optional(),
+    application: z.number().nonnegative().max(999999999.99, "Value too large").optional(),
   })
   .refine(
     (data) =>

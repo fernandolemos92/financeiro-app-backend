@@ -38,12 +38,23 @@ export async function dbUpsert(
 ): Promise<PlannedAmounts> {
   const client = createSupabaseClient()
 
+  // Validate amounts are properly formatted
+  const debt = input.debt ?? 0
+  const cost_of_living = input.cost_of_living ?? 0
+  const pleasure = input.pleasure ?? 0
+  const application = input.application ?? 0
+
+  // Check for NaN or invalid numbers
+  if (![debt, cost_of_living, pleasure, application].every(n => typeof n === 'number' && !isNaN(n) && isFinite(n))) {
+    throw new Error("Invalid numeric value provided")
+  }
+
   const upsertData = {
     month,
-    debt: input.debt ?? 0,
-    cost_of_living: input.cost_of_living ?? 0,
-    pleasure: input.pleasure ?? 0,
-    application: input.application ?? 0,
+    debt,
+    cost_of_living,
+    pleasure,
+    application,
   }
 
   const { data, error } = await client
@@ -53,6 +64,10 @@ export async function dbUpsert(
     .single()
 
   if (error) {
+    // Provide more helpful error messages
+    if (error.message.includes("overflow")) {
+      throw new Error("Value is too large. Maximum supported: R$ 999.999.999,99")
+    }
     throw new Error(`Failed to upsert planned amounts: ${error.message}`)
   }
 

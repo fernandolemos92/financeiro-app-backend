@@ -248,3 +248,33 @@ export async function dbDelete(id: string, userId: string): Promise<boolean> {
 
   return true
 }
+
+export async function dbDeleteSeries(groupId: string, userId: string): Promise<number> {
+  const client = createSupabaseClient()
+
+  // Verify that at least one transaction in this series belongs to the user and count them
+  const { data: existingRecords, error: countError } = await client
+    .from("transactions")
+    .select("id")
+    .eq("installment_group_id", groupId)
+    .eq("user_id", userId)
+
+  // If no records exist for this user, return 0
+  if (!existingRecords || existingRecords.length === 0) {
+    return 0
+  }
+
+  const deletedCount = existingRecords.length
+
+  const { error: deleteError } = await client
+    .from("transactions")
+    .delete()
+    .eq("installment_group_id", groupId)
+    .eq("user_id", userId)
+
+  if (deleteError) {
+    throw new Error(`Failed to delete transaction series: ${deleteError.message}`)
+  }
+
+  return deletedCount
+}
