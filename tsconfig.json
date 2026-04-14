@@ -8,7 +8,6 @@
     "rootDir": "./src",
     "strict": true,
     "esModuleInterop": true,
-    "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "declaration": true,
@@ -21,6 +20,10 @@
       "@/*": ["src/*"]
     }
   },
+  "tsc-alias": {
+  "resolveFullPaths": true,
+  "resolveFullExtension": ".js"
+},
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
 }
